@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <header className="mb-12">
-        <h1 className="text-3xl font-bold mb-2">Quesadilla Fan Club</h1>
+        <h1 className="text-3xl font-bold mb-2">Welcome to the Quesadilla Fan Club</h1>
         <p className="text-gray-600">About psychology.</p>
       </header>
 
