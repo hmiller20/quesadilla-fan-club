@@ -8,8 +8,8 @@ import { Inter } from "next/font/google"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "My Personal Blog",
-  description: "A simple personal blog where I share my thoughts and ideas",
+  title: "Quesadilla Fan Club",
+  description: "About psychology.",
 }
 
 export default function RootLayout({
@@ -29,6 +29,9 @@ export default function RootLayout({
               <div className="flex gap-4 sm:gap-6">
                 <Link href="/" className="hover:text-gray-600 transition-colors">
                   Home
+                </Link>
+                <Link href="/posts" className="hover:text-gray-600 transition-colors">
+                  All Posts
                 </Link>
                 <Link href="/about" className="hover:text-gray-600 transition-colors">
                   About

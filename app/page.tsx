@@ -1,6 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   // In a real app, you would fetch these from a CMS or database
@@ -36,25 +37,34 @@ export default function Home() {
       </header>
 
       <main>
-        <div className="space-y-10">
-          {posts.map((post) => (
-            <article key={post.id} className="border-b pb-8">
-              <time className="text-sm text-gray-500">{post.date}</time>
-              <h2 className="text-xl font-semibold mt-1 mb-2">
-                <Link href={`/posts/${post.slug}`} className="hover:underline">
-                  {post.title}
+        <section>
+          <h2 className="text-2xl font-semibold mb-8">Recent Posts</h2>
+          <div className="space-y-10">
+            {posts.map((post) => (
+              <article key={post.id} className="border-b pb-8">
+                <time className="text-sm text-gray-500">{post.date}</time>
+                <h2 className="text-xl font-semibold mt-1 mb-2">
+                  <Link href={`/posts/${post.slug}`} className="hover:underline">
+                    {post.title}
+                  </Link>
+                </h2>
+                <p className="text-gray-700 mb-4">{post.excerpt}</p>
+                <Link
+                  href={`/posts/${post.slug}`}
+                  className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700"
+                >
+                  Read more <ArrowRight className="ml-1 h-4 w-4" />
                 </Link>
-              </h2>
-              <p className="text-gray-700 mb-4">{post.excerpt}</p>
-              <Link
-                href={`/posts/${post.slug}`}
-                className="inline-flex items-center text-sm font-medium text-gray-900 hover:text-gray-700"
-              >
-                Read more <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16 text-center">
+          <Button variant="default" size="lg" className="bg-black hover:bg-black/90">
+            Subscribe
+          </Button>
+        </section>
       </main>
     </div>
   )
