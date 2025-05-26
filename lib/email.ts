@@ -46,13 +46,12 @@ export async function sendNewPostEmail(postId: string) {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     const postUrl = `${baseUrl}/posts/${post.slug}`
-    const unsubscribeUrl = (token: string) => `${baseUrl}/api/unsubscribe?token=${token}`
 
     // Send emails to all subscribers
     const emailPromises = subscribers.map(async (subscriber: Pick<Subscriber, 'email' | 'firstName' | 'confirmToken'>) => {
       // Allow sending even if confirmToken is null
       const token = subscriber.confirmToken || '';
-      const unsubscribeUrl = `${baseUrl}/api/unsubscribe?email=${encodeURIComponent(subscriber.email)}&token=${token}`;
+      const unsubscribeUrlForSubscriber = `${baseUrl}/api/unsubscribe?email=${encodeURIComponent(subscriber.email)}&token=${token}`;
 
       const emailHtml = await renderAsync(
         NewPostEmail({
@@ -60,7 +59,7 @@ export async function sendNewPostEmail(postId: string) {
           postTitle: post.title,
           postTeaser: post.teaser || undefined,
           postUrl,
-          unsubscribeUrl: unsubscribeUrl(token),
+          unsubscribeUrl: unsubscribeUrlForSubscriber,
         })
       )
 
