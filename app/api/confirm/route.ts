@@ -33,6 +33,5 @@ export async function GET(request: NextRequest) {
   });
 
   // You can return a JSON message, or redirect to a thank you page
-  // return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/thank-you`);
-  return NextResponse.json({ message: "Your email has been confirmed! Thank you for subscribing." });
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_BASE_URL}/confirm?success=1`);
 }
