@@ -1,8 +1,16 @@
 'use client'
 
+import dynamicImport from 'next/dynamic'
 import { useEffect } from 'react'
-import FullscreenSky from '@/layouts/FullscreenSky'
 import { useAuth } from '@/lib/context/auth-context'
+
+// Dynamically import the FullscreenSky component with no SSR
+const FullscreenSky = dynamicImport(() => import('@/layouts/FullscreenSky'), {
+  ssr: false,
+})
+
+// Disable static generation for this page
+export const dynamic = 'force-dynamic'
 
 export default function SkyPage() {
   const { isAuthenticated, loading } = useAuth()
