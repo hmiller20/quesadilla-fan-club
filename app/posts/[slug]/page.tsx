@@ -12,18 +12,22 @@ import { notFound } from "next/navigation"
 // Force dynamic rendering to ensure proper server-side behavior
 export const dynamic = 'force-dynamic'
 
+// Add runtime configuration to help with debugging
+export const runtime = 'nodejs'
+
 interface PageProps {
-  params: Promise<{ slug: string }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  params: { slug: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default async function PostPage({ params }: PageProps) {
   try {
-    const resolvedParams = await params
+    console.log('Fetching post with slug:', params.slug)
+    
     // Fetch the post from the database using the slug
     const post = await prisma.post.findFirst({
       where: {
-        slug: resolvedParams.slug,
+        slug: params.slug,
         isPublished: true,
       },
       select: {
@@ -32,11 +36,17 @@ export default async function PostPage({ params }: PageProps) {
         content: true,
         publishedAt: true,
       },
+    }).catch(error => {
+      console.error('Database error:', error)
+      throw new Error('Failed to fetch post from database')
     })
 
     if (!post) {
+      console.log('Post not found for slug:', params.slug)
       notFound()
     }
+
+    console.log('Successfully fetched post:', post.title)
 
     return (
       <div className="max-w-2xl mx-auto px-4 py-12">
@@ -56,7 +66,15 @@ export default async function PostPage({ params }: PageProps) {
       </div>
     )
   } catch (error) {
-    console.error('Error loading post:', error)
-    throw error // This will trigger Next.js error boundary
+    // Log the full error details
+    console.error('Error in PostPage:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      slug: params.slug
+    })
+    
+    // Rethrow with a more specific error message
+    throw new Error(`Failed to load post: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
