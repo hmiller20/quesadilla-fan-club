@@ -5,6 +5,11 @@ import { prisma } from "@/lib/db"
 import { notFound } from "next/navigation"
 import PostEditor from "@/app/components/PostEditor"
 
+type Props = {
+  params: { slug: string }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
 // Define the Post type based on our Prisma schema
 type Post = {
   id: string
@@ -20,7 +25,7 @@ type Post = {
   publishedAt: Date
 }
 
-export default async function EditPost({ params }: { params: { slug: string } }) {
+export default async function EditPost({ params }: Props) {
   // Query the database using Prisma
   const post = await prisma.post.findFirst({
     where: {
