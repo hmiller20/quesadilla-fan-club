@@ -1,18 +1,19 @@
 // this file updates a post, including the initial publishing (?)
 
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { title, teaser, content, isPublished } = await request.json()
+    const resolvedParams = await context.params
 
     const updatedPost = await prisma.post.update({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
       },
       data: {
         title,

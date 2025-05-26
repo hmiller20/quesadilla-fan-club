@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const draftsOnly = searchParams.get('drafts') === 'true'
     const trashedOnly = searchParams.get('trashed') === 'true'
     const publishedOnly = searchParams.get('published') === 'true'
@@ -37,22 +37,29 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     console.log("POST /api/posts body:", body)
+    const { share, ...postData } = body // Extract share from body but don't store it
     const post = await prisma.post.create({
       data: {
-        title: body.title,
-        teaser: body.teaser || null,
-        content: body.content,
-        isDraft: body.isDraft ?? true,
-        isPublished: body.isPublished ?? false,
-        authorId: body.authorId, // TODO: Get this from the session
-        slug: body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-        share: body.share ?? false,
+        title: postData.title,
+        teaser: postData.teaser || null,
+        content: postData.content,
+        isDraft: postData.isDraft ?? true,
+        isPublished: postData.isPublished ?? false,
+        authorId: postData.authorId, // TODO: Get this from the session
+        slug: postData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       }
     })
+
+    // Handle share action if needed
+    if (share && !postData.isDraft) {
+      // TODO: Implement email sending logic here
+      console.log('Share post with subscribers:', post.id)
+    }
+
     return NextResponse.json(post)
   } catch (error) {
     console.error("POST /api/posts error:", error)
@@ -60,9 +67,9 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const id = searchParams.get('id')
     const action = searchParams.get('action')
     
@@ -93,9 +100,9 @@ export async function DELETE(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
+    const searchParams = request.nextUrl.searchParams
     const id = searchParams.get('id')
     const action = searchParams.get('action')
     
@@ -104,21 +111,28 @@ export async function PATCH(request: Request) {
     }
 
     // Parse body if needed
-    let body = {}
+    let body: { share?: boolean } = {}
     if (action === 'publish') {
       body = await request.json()
     }
 
     switch (action) {
       case 'publish': {
+        const { share, ...updateData } = body // Extract share from body but don't store it
         const post = await prisma.post.update({
           where: { id },
           data: {
             isDraft: false,
             isPublished: true,
-            share: body.share ?? false,
           }
         })
+
+        // Handle share action if needed
+        if (share) {
+          // TODO: Implement email sending logic here
+          console.log('Share post with subscribers:', post.id)
+        }
+
         return NextResponse.json(post)
       }
       case 'trash': {

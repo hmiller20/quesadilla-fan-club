@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { randomBytes } from "crypto";
 import { Resend } from "resend";
@@ -10,7 +10,7 @@ function generateToken(length = 32) {
   return randomBytes(length).toString("hex");
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { email, firstName, lastName } = await request.json();
 
