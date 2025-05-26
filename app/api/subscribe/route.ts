@@ -25,11 +25,29 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       if (existing.isConfirmed) {
-        return NextResponse.json({ error: "This email is already subscribed and confirmed." }, { status: 409 });
+        // Update the name even if already confirmed
+        await prisma.subscriber.update({
+          where: { email },
+          data: { firstName, lastName }
+        });
+        return NextResponse.json({ error: "This email is already subscribed and confirmed. Your name has been updated." }, { status: 409 });
       } else {
-        // Resend confirmation if not confirmed
-        await sendConfirmationEmail(existing.email, existing.firstName, existing.confirmToken!);
-        return NextResponse.json({ message: "Please check your email to confirm your subscription." });
+        // Update the name and resend confirmation
+        await prisma.subscriber.update({
+          where: { email },
+          data: { 
+            firstName, 
+            lastName,
+            confirmToken: generateToken() // Generate a new token
+          }
+        });
+        try {
+          await sendConfirmationEmail(email, firstName, existing.confirmToken!);
+          return NextResponse.json({ message: "Please check your email to confirm your subscription." });
+        } catch (emailError) {
+          console.error("Error sending confirmation email:", emailError);
+          return NextResponse.json({ error: "Failed to send confirmation email. Please try again." }, { status: 500 });
+        }
       }
     }
 
@@ -60,7 +78,7 @@ async function sendConfirmationEmail(email: string, firstName: string, token: st
   const confirmUrl = `${baseUrl}/api/confirm?token=${token}&email=${encodeURIComponent(email)}`;
 
   await resend.emails.send({
-    from: "Quesadilla Fan Club <noreply@quesadilla-fan-club.com>", // Use your verified sender
+    from: "Quesadilla Fan Club <noreply@quesadillafanclub.com>", // Use your verified sender
     to: email,
     subject: "Confirm your subscription",
     html: `
