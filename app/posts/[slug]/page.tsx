@@ -15,19 +15,35 @@ export const dynamic = 'force-dynamic'
 // Add runtime configuration to help with debugging
 export const runtime = 'nodejs'
 
+// Type for the actual runtime params
+type RuntimeParams = {
+  slug: string
+}
+
+// Type that satisfies Next.js's build system
 interface PageProps {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
+  params: Promise<RuntimeParams>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+// Helper function to safely extract params
+async function getParams(params: Promise<RuntimeParams> | RuntimeParams): Promise<RuntimeParams> {
+  if (params instanceof Promise) {
+    return params
+  }
+  return params
 }
 
 export default async function PostPage({ params }: PageProps) {
   try {
-    console.log('Fetching post with slug:', params.slug)
+    // Safely handle params whether they're a Promise or not
+    const runtimeParams = await getParams(params)
+    console.log('Fetching post with slug:', runtimeParams.slug)
     
     // Fetch the post from the database using the slug
     const post = await prisma.post.findFirst({
       where: {
-        slug: params.slug,
+        slug: runtimeParams.slug,
         isPublished: true,
       },
       select: {
@@ -42,7 +58,7 @@ export default async function PostPage({ params }: PageProps) {
     })
 
     if (!post) {
-      console.log('Post not found for slug:', params.slug)
+      console.log('Post not found for slug:', runtimeParams.slug)
       notFound()
     }
 
@@ -71,7 +87,7 @@ export default async function PostPage({ params }: PageProps) {
       error,
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
-      slug: params.slug
+      params: params instanceof Promise ? 'Promise' : params
     })
     
     // Rethrow with a more specific error message
