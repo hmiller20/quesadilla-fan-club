@@ -8,11 +8,17 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react" // for the back button
 import { prisma } from "@/lib/db" // for the database
 
-export default async function Post({ params }: { params: { slug: string } }) {
+interface PageProps {
+  params: Promise<{ slug: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function Post({ params }: PageProps) {
+  const resolvedParams = await params
   // Fetch the post from the database using the slug
   const post = await prisma.post.findFirst({
     where: {
-      slug: params.slug,
+      slug: resolvedParams.slug,
       isPublished: true,
     },
     select: {
