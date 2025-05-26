@@ -7,7 +7,7 @@ import PostEditor from "@/app/components/PostEditor"
 
 interface PageProps {
   params: Promise<{ slug: string }>
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
 // Define the Post type based on our Prisma schema
@@ -25,8 +25,8 @@ type Post = {
   publishedAt: Date
 }
 
-export default async function EditPost({ params }: PageProps) {
-  const resolvedParams = await params
+export default async function EditPost({ params, searchParams }: PageProps) {
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams])
   // Query the database using Prisma
   const post = await prisma.post.findFirst({
     where: {
