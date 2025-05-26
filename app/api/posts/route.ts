@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         content: postData.content,
         isDraft: postData.isDraft ?? true,
         isPublished: postData.isPublished ?? false,
-        authorId: postData.authorId, // TODO: Get this from the session
+        authorId: '1', // I am number one
         slug: postData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
       }
     })
