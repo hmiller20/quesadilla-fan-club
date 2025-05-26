@@ -50,10 +50,9 @@ export async function sendNewPostEmail(postId: string) {
 
     // Send emails to all subscribers
     const emailPromises = subscribers.map(async (subscriber: Pick<Subscriber, 'email' | 'firstName' | 'confirmToken'>) => {
-      if (!subscriber.confirmToken) {
-        console.warn(`Subscriber ${subscriber.email} has no confirm token, skipping email`)
-        return
-      }
+      // Allow sending even if confirmToken is null
+      const token = subscriber.confirmToken || '';
+      const unsubscribeUrl = `${baseUrl}/api/unsubscribe?email=${encodeURIComponent(subscriber.email)}&token=${token}`;
 
       const emailHtml = await renderAsync(
         NewPostEmail({
@@ -61,7 +60,7 @@ export async function sendNewPostEmail(postId: string) {
           postTitle: post.title,
           postTeaser: post.teaser || undefined,
           postUrl,
-          unsubscribeUrl: unsubscribeUrl(subscriber.confirmToken),
+          unsubscribeUrl: unsubscribeUrl(token),
         })
       )
 
