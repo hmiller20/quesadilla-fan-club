@@ -12,7 +12,8 @@ export default function FullscreenSky() {
         className="relative w-screen overflow-hidden max-h-[calc(100vh-4rem)]"
         style={{ height: 'calc(100vh - 4rem)' }}
       >
-        <SkyScene mode="full" />
+        {/* <SkyScene mode="full" /> */}
+        <div>SkyScene placeholder</div>
       </div>
     </TimeProvider>
   )

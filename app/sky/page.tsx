@@ -4,10 +4,7 @@ import dynamicImport from 'next/dynamic'
 import { useEffect } from 'react'
 import { useAuth } from '@/lib/context/auth-context'
 
-// Replace this:
-  // const FullscreenSky = dynamicImport(() => import('@/layouts/FullscreenSky'), { ssr: false });
-  // With this:
-  const FullscreenSky = () => <div>Test FullscreenSky</div>;
+const FullscreenSky = dynamicImport(() => import('@/layouts/FullscreenSky'), { ssr: false });
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic'
