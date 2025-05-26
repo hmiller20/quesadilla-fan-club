@@ -5,8 +5,8 @@ import { prisma } from "@/lib/db"
 import { notFound } from "next/navigation"
 import PostEditor from "@/app/components/PostEditor"
 
-type Props = {
-  params: { slug: string }
+interface PageProps {
+  params: Promise<{ slug: string }>
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
@@ -25,11 +25,12 @@ type Post = {
   publishedAt: Date
 }
 
-export default async function EditPost({ params }: Props) {
+export default async function EditPost({ params }: PageProps) {
+  const resolvedParams = await params
   // Query the database using Prisma
   const post = await prisma.post.findFirst({
     where: {
-      slug: params.slug,
+      slug: resolvedParams.slug,
     },
     select: {
       id: true,
