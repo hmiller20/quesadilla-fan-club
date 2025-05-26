@@ -4,10 +4,10 @@ import dynamicImport from 'next/dynamic'
 import { useEffect } from 'react'
 import { useAuth } from '@/lib/context/auth-context'
 
-// Dynamically import the FullscreenSky component with no SSR
-const FullscreenSky = dynamicImport(() => import('@/layouts/FullscreenSky'), {
-  ssr: false,
-})
+// Replace this:
+  // const FullscreenSky = dynamicImport(() => import('@/layouts/FullscreenSky'), { ssr: false });
+  // With this:
+  const FullscreenSky = () => <div>Test FullscreenSky</div>;
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic'
