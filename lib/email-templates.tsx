@@ -33,7 +33,7 @@ export const NewPostEmail = ({
         <Container style={container}>
           <Heading style={h1}>Hey {firstName}!</Heading>
           <Text style={text}>
-            We just published a new post that we think you'll enjoy:
+            I put some more words on the internet. Hot off the press. Come and get 'em while they're still warm.
           </Text>
           <Heading style={h2}>{postTitle}</Heading>
           {postTeaser && <Text style={text}>{postTeaser}</Text>}
@@ -41,10 +41,10 @@ export const NewPostEmail = ({
             Read the post
           </Link>
           <Text style={footer}>
-            You're receiving this email because you subscribed to the Quesadilla Fan Club newsletter.
+            You're receiving this email because you signed up to receive Quesadilla Fan Club email alerts.
             <br />
             <Link href={unsubscribeUrl} style={link}>
-              Unsubscribe
+              Unsubscribe/I Hate Quesadillas
             </Link>
           </Text>
         </Container>
