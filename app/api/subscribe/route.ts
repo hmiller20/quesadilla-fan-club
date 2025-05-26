@@ -32,17 +32,20 @@ export async function POST(request: NextRequest) {
         });
         return NextResponse.json({ error: "This email is already subscribed and confirmed. Your name has been updated." }, { status: 409 });
       } else {
-        // Update the name and resend confirmation
+        // Generate new token first
+        const newToken = generateToken();
+        // Update the name and token
         await prisma.subscriber.update({
           where: { email },
           data: { 
             firstName, 
             lastName,
-            confirmToken: generateToken() // Generate a new token
+            confirmToken: newToken
           }
         });
         try {
-          await sendConfirmationEmail(email, firstName, existing.confirmToken!);
+          // Use the new token for the confirmation email
+          await sendConfirmationEmail(email, firstName, newToken);
           return NextResponse.json({ message: "Please check your email to confirm your subscription." });
         } catch (emailError) {
           console.error("Error sending confirmation email:", emailError);
