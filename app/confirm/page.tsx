@@ -23,8 +23,8 @@ export default function ConfirmPage() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2l4 -4m5 2a9 9 0 1 1 -18 0a9 9 0 0 1 18 0z" />
         </svg>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-gray-900">Email Confirmed!</h1>
-        <p className="text-gray-700 mb-6 text-base sm:text-lg">Your email has been confirmed! Welcome to the club.</p>
-        <Link href="/" className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg px-6 py-3 transition-colors duration-200 w-full sm:w-auto">Return to Home</Link>
+        <p className="text-gray-700 mb-6 text-base sm:text-lg">Welcome to the club.</p>
+        <Link href="/" className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg px-6 py-3 transition-colors duration-200 w-full sm:w-auto">Return to Home Page</Link>
       </div>
     </div>
   );
