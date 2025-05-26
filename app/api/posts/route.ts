@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { sendNewPostEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,8 +59,12 @@ export async function POST(request: NextRequest) {
 
     // Handle share action if needed
     if (share && !postData.isDraft) {
-      // TODO: Implement email sending logic here
-      console.log('Share post with subscribers:', post.id)
+      try {
+        await sendNewPostEmail(post.id)
+      } catch (error) {
+        console.error('Error sending new post emails:', error)
+        // Don't fail the post creation if email sending fails
+      }
     }
 
     return NextResponse.json(post)
@@ -131,8 +136,12 @@ export async function PATCH(request: NextRequest) {
 
         // Handle share action if needed
         if (share) {
-          // TODO: Implement email sending logic here
-          console.log('Share post with subscribers:', post.id)
+          try {
+            await sendNewPostEmail(post.id)
+          } catch (error) {
+            console.error('Error sending new post emails:', error)
+            // Don't fail the publish if email sending fails
+          }
         }
 
         return NextResponse.json(post)
@@ -158,9 +167,13 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json(post)
       }
       case 'share': {
-        // Fetch post, send email to all subscribers
-        // (Implement email logic here)
-        return NextResponse.json({ success: true })
+        try {
+          await sendNewPostEmail(id)
+          return NextResponse.json({ success: true })
+        } catch (error) {
+          console.error('Error sending share emails:', error)
+          return NextResponse.json({ error: 'Failed to share post' }, { status: 500 })
+        }
       }
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
