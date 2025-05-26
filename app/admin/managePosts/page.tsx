@@ -139,7 +139,7 @@ export default function ManagePosts() {
                       if (!window.confirm("Send this post to all subscribers now?")) return
                       try {
                         const response = await fetch(`/api/posts?id=${post.id}&action=share`, {
-                          method: 'POST',
+                          method: 'PATCH',
                         })
                         if (!response.ok) throw new Error('Failed to share post')
                         alert('Post shared with all subscribers!')
