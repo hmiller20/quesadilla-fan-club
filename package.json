@@ -14,8 +14,8 @@
     "@prisma/client": "^6.8.2",
     "@radix-ui/react-slot": "^1.2.0",
     "@react-email/components": "^0.0.41",
-    "@react-three/drei": "^10.0.8",
-    "@react-three/fiber": "^9.1.2",
+    "@react-three/drei": "^9.88.0",
+    "@react-three/fiber": "^8.15.12",
     "@tiptap/extension-image": "^2.11.7",
     "@tiptap/extension-link": "^2.11.7",
     "@tiptap/extension-placeholder": "^2.11.7",
@@ -41,9 +41,9 @@
     "three": "^0.176.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
+    "@types/node": "^20.17.50",
+    "@types/react": "^18.3.22",
+    "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.0.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.0.4",
