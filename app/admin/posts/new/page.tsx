@@ -61,7 +61,7 @@ export default function NewPost() {
       if (isDraft) {
         router.push('/admin/drafts')
       } else {
-        router.push(`/admin/posts/${post.id}/edit`)
+        router.push('/admin/managePosts')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save post')
