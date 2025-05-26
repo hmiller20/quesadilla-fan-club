@@ -1,30 +1,12 @@
-import React from "react"
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import HomePageWithModal from "./HomePageWithModal"
+import { prisma } from "@/lib/db"
 
-export default function Home() {
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-12">
-      <header className="mb-12">
-        <h1 className="text-3xl font-bold mb-2">Welcome to the Quesadilla Fan Club!</h1>
-        <p className="text-gray-600">About psychology.</p>
-      </header>
-
-      <main>
-        <section>
-          <h2 className="text-2xl font-semibold mb-8">Recent Posts</h2>
-          <div className="space-y-10">
-            {/* Posts will be added here */}
-          </div>
-        </section>
-
-        <section className="mt-16 text-center">
-          <Button variant="default" size="lg" className="bg-black hover:bg-black/90">
-            Subscribe
-          </Button>
-        </section>
-      </main>
-    </div>
-  )
+export default async function Home() {
+  const posts = await prisma.post.findMany({
+    where: { isPublished: true, trashedAt: null },
+    orderBy: { publishedAt: 'desc' },
+    select: { id: true, title: true, teaser: true, slug: true, publishedAt: true },
+    take: 3 // max three posts on home page
+  })
+  return <HomePageWithModal posts={posts} />
 }

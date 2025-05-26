@@ -1,16 +1,85 @@
 'use client'
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import Editor from "@/components/editor"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/context/auth-context"
+import PostEditor from '@/app/components/PostEditor'
 
 export default function NewPost() {
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const router = useRouter()
+  const { user, loading, isAuthenticated } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (isDraft: boolean) => {
-    // TODO: Implement post creation
-    console.log({ title, content, isDraft })
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace('/admin/signin')
+    }
+  }, [loading, isAuthenticated, router])
+
+  const handleSave = async (title: string, teaser: string, content: string, isDraft: boolean) => {
+    if (!user) {
+      setError('You must be signed in to create a post')
+      return
+    }
+    if (!title.trim()) {
+      setError('Please enter a title')
+      return
+    }
+    setIsSubmitting(true)
+    setError(null)
+
+    // If publishing, ask Share or Silent
+    let share = false
+    if (!isDraft) {
+      const result = window.confirm("Would you like to share this post with all subscribers?\n\nPress Yes for 'Share', No for 'Silent'.")
+      share = result // Yes = Share, No = Silent
+    }
+
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          teaser,
+          content,
+          isDraft,
+          isPublished: !isDraft,
+          authorId: user.uid,
+          share, // <-- pass share flag to backend
+        }),
+      })
+      if (!response.ok) {
+        throw new Error('Failed to save post')
+      }
+      const post = await response.json()
+      if (isDraft) {
+        router.push('/admin/drafts')
+      } else {
+        router.push(`/admin/posts/${post.id}/edit`)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save post')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null // This prevents flash of content before redirect
   }
 
   return (
@@ -19,28 +88,20 @@ export default function NewPost() {
         <h1 className="text-3xl font-bold">Create New Post</h1>
         <p className="text-gray-600 mt-2">Write and preview your post</p>
       </header>
-
-      <div className="space-y-6">
-        {/* Title input */}
-        <div>
-          <input
-            type="text"
-            placeholder="Post title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-3xl font-bold border-0 border-b-2 border-gray-200 focus:border-black focus:ring-0 pb-2"
-          />
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-md">
+          {error}
         </div>
-
-        {/* Rich text editor */}
-        <Editor content={content} onChange={setContent} />
-
-        {/* Action buttons */}
-        <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => handleSubmit(true)}>Save as Draft</Button>
-          <Button onClick={() => handleSubmit(false)}>Publish</Button>
-        </div>
-      </div>
+      )}
+      <PostEditor
+        initialContent=""
+        initialTitle=""
+        initialTeaser=""
+        postId=""
+        isPublished={false}
+        onSave={handleSave}
+        isSaving={isSubmitting}
+      />
     </div>
   )
 } 

@@ -106,8 +106,6 @@
   @apply mb-1;
 }
 
-
-
 @layer base {
   * {
     @apply border-border;
@@ -115,4 +113,10 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Prevent scrolling on the sky page */
+body.sky-page, html.sky-page {
+  overflow: hidden !important;
+  height: 100vh;
 }

@@ -17,14 +17,17 @@ export default function AdminLayout({
             <Link href="/admin" className="block hover:bg-gray-100 p-2 rounded-md">
               Overview
             </Link>
-            <Link href="/admin/posts" className="block hover:bg-gray-100 p-2 rounded-md">
-              All Posts
+            <Link href="/admin/managePosts" className="block hover:bg-gray-100 p-2 rounded-md">
+              Manage Posts
             </Link>
             <Link href="/admin/posts/new" className="block hover:bg-gray-100 p-2 rounded-md">
               New Post
             </Link>
             <Link href="/admin/drafts" className="block hover:bg-gray-100 p-2 rounded-md">
               Drafts
+            </Link>
+            <Link href="/admin/trash" className="block hover:bg-gray-100 p-2 rounded-md text-red-600">
+              Trash
             </Link>
           </nav>
         </div>
