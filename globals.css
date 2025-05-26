@@ -122,3 +122,15 @@ body.sky-page, html.sky-page {
   overflow: hidden !important;
   height: 100vh;
 }
+
+/* Hamburger menu overlay for mobile */
+.header-mobile-menu-open {
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .header-mobile-menu-open body {
+    overflow: hidden;
+    touch-action: none;
+  }
+}
