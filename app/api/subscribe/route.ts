@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { randomBytes } from "crypto";
 import { Resend } from "resend";
 
+export const dynamic = 'force-dynamic'
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Helper to generate a random token

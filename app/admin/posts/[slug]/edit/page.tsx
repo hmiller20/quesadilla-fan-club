@@ -5,6 +5,8 @@ import { prisma } from "@/lib/db"
 import { notFound } from "next/navigation"
 import PostEditor from "@/app/components/PostEditor"
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>

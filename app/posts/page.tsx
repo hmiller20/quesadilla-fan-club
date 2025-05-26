@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { prisma } from "@/lib/db"
 
+export const dynamic = 'force-dynamic'
+
 export default async function PostsPage() {
   // Fetch all published posts
   const posts = await prisma.post.findMany({

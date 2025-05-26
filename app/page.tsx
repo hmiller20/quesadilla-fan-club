@@ -1,6 +1,8 @@
 import HomePageWithModal from "./HomePageWithModal"
 import { prisma } from "@/lib/db"
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
   const posts = await prisma.post.findMany({
     where: { isPublished: true, trashedAt: null },
