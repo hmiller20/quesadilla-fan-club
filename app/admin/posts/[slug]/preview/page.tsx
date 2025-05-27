@@ -8,12 +8,13 @@ import { Button } from "@/components/ui/button"
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  params: Promise<{ slug: string }> | { slug: string }
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined }
+  params: Promise<{ slug: string }> | undefined
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | undefined
 }
 
 async function getParams(params: PageProps['params']) {
-  return params instanceof Promise ? await params : params
+  if (!params) throw new Error('No params provided')
+  return await params
 }
 
 export default async function PreviewPostPage({ params }: PageProps) {
