@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button"
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }> | { slug: string }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | string[] | undefined }
 }
 
-async function getParams(params: PageProps['params'] | Promise<PageProps['params']>) {
+async function getParams(params: PageProps['params']) {
   return params instanceof Promise ? await params : params
 }
 
