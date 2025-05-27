@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Pencil, Trash2, Eye, Calendar } from 'lucide-react'
+import { Pencil, Trash2, Eye, Calendar, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/lib/context/auth-context'
 import { useRouter } from 'next/navigation'
@@ -153,6 +153,16 @@ export default function DraftsPage() {
                   >
                     Publish
                   </Button>
+                  <Link 
+                    href={`/admin/posts/${draft.slug}/preview`} 
+                    target="_blank"
+                    className="flex-1"
+                  >
+                    <Button variant="outline" size="sm" className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Preview
+                    </Button>
+                  </Link>
                   <Link href={`/admin/posts/${draft.slug}/edit`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
                       <Pencil className="h-4 w-4 mr-1" />

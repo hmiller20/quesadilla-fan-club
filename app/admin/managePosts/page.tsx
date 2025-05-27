@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/context/auth-context'
 import { Button } from '@/components/ui/button'
-import { Trash2, Eye, Calendar } from 'lucide-react'
+import { Trash2, Eye, Calendar, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 
@@ -126,6 +126,16 @@ export default function ManagePosts() {
                   {post.content.replace(/<[^>]*>/g, '')}
                 </p>
                 <div className="flex flex-wrap gap-2">
+                  <Link 
+                    href={`/admin/posts/${post.slug}/preview`} 
+                    target="_blank"
+                    className="flex-1"
+                  >
+                    <Button variant="outline" size="sm" className="w-full text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Preview
+                    </Button>
+                  </Link>
                   <Link href={`/admin/posts/${post.slug}/edit`} className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
                       Edit

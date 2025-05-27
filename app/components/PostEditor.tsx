@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
-import { ImageIcon } from 'lucide-react'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import { ImageIcon, Minus, Hash, Eye } from 'lucide-react'
 
 type PostEditorProps = {
   initialContent: string
@@ -46,6 +47,11 @@ export default function PostEditor({
       Image.configure({
         HTMLAttributes: {
           class: 'max-w-full rounded-lg',
+        },
+      }),
+      HorizontalRule.configure({
+        HTMLAttributes: {
+          class: 'my-8 border-t border-gray-300',
         },
       }),
     ],
@@ -133,6 +139,33 @@ export default function PostEditor({
     input.click()
   }
 
+  const handleAddFootnote = () => {
+    const content = window.prompt('Enter footnote content:')
+    if (content && editor) {
+      const footnoteId = `footnote-${Date.now()}`
+      const footnoteHtml = `<sup><a href="#${footnoteId}" id="footnote-ref-${footnoteId}">[1]</a></sup><div id="${footnoteId}" class="footnote">${content}</div>`
+      editor.commands.insertContent(footnoteHtml)
+    }
+  }
+
+  const handlePreview = () => {
+    if (!postId) {
+      // For new posts, we need to save first
+      if (!title.trim()) {
+        alert('Please enter a title before previewing')
+        return
+      }
+      // Save as draft first
+      savePost(false).then(() => {
+        // After saving, we'll get redirected to the edit page which has the postId
+        // The user can then click preview again
+      })
+    } else {
+      // For existing posts, open preview in new tab
+      window.open(`/admin/posts/${postId}/preview`, '_blank')
+    }
+  }
+
   return (
     <form className="space-y-6">
       <div>
@@ -217,6 +250,22 @@ export default function PostEditor({
             </button>
             <button
               type="button"
+              onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+              className="p-2 rounded hover:bg-gray-100"
+              title="Add horizontal rule"
+            >
+              <Minus className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
+              onClick={handleAddFootnote}
+              className="p-2 rounded hover:bg-gray-100"
+              title="Add footnote"
+            >
+              <Hash className="h-5 w-5" />
+            </button>
+            <button
+              type="button"
               onClick={handleImageUpload}
               disabled={isUploading}
               className={`p-2 rounded hover:bg-gray-100 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -225,11 +274,22 @@ export default function PostEditor({
               <ImageIcon className="h-5 w-5" />
             </button>
           </div>
-          <EditorContent editor={editor} className="p-4 min-h-[500px] prose max-w-none" />
+          <EditorContent 
+            editor={editor} 
+            className="p-4 min-h-[500px] prose max-w-none [&_.footnote]:mt-8 [&_.footnote]:text-sm [&_.footnote]:text-gray-600 [&_.footnote]:border-t [&_.footnote]:border-gray-200 [&_.footnote]:pt-2 [&_sup_a]:no-underline [&_sup_a]:text-indigo-600 [&_sup_a]:hover:text-indigo-800" 
+          />
         </div>
       </div>
 
       <div className="flex justify-end space-x-4">
+        <button
+          type="button"
+          onClick={handlePreview}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+        >
+          <Eye className="h-4 w-4 inline-block mr-1" />
+          Preview
+        </button>
         <button
           type="button"
           onClick={handleSaveChanges}
