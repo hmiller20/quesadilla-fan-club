@@ -27,4 +27,41 @@
 .prose :where(a):not(:where([class~="not-prose"] *)) {
   @apply text-green-700 underline hover:text-green-900 transition-colors;
   text-decoration-color: inherit;
+}
+
+/* Text size marks */
+.ProseMirror mark[data-type="textSmall"],
+.prose mark[data-type="textSmall"] {
+  @apply text-sm bg-transparent;
+}
+
+.ProseMirror mark[data-type="textLarge"],
+.prose mark[data-type="textLarge"] {
+  @apply text-lg bg-transparent;
+}
+
+.ProseMirror mark[data-type="textXLarge"],
+.prose mark[data-type="textXLarge"] {
+  @apply text-xl bg-transparent;
+}
+
+/* Text color marks */
+.ProseMirror mark[data-type="textBlue"],
+.prose mark[data-type="textBlue"] {
+  @apply text-blue-600 bg-transparent;
+}
+
+.ProseMirror mark[data-type="textGreen"],
+.prose mark[data-type="textGreen"] {
+  @apply text-green-600 bg-transparent;
+}
+
+.ProseMirror mark[data-type="textRed"],
+.prose mark[data-type="textRed"] {
+  @apply text-red-600 bg-transparent;
+}
+
+.ProseMirror mark[data-type="textPurple"],
+.prose mark[data-type="textPurple"] {
+  @apply text-purple-600 bg-transparent;
 } 

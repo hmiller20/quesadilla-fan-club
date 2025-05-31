@@ -8,7 +8,10 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
-import { ImageIcon, Minus, Hash, Eye } from 'lucide-react'
+import Superscript from '@tiptap/extension-superscript'
+import Subscript from '@tiptap/extension-subscript'
+import { ImageIcon, Minus, Hash, Eye, Type, Superscript as SuperscriptIcon, Subscript as SubscriptIcon } from 'lucide-react'
+import { TextMarks } from './extensions/TextMarks'
 
 type PostEditorProps = {
   initialContent: string
@@ -20,6 +23,21 @@ type PostEditorProps = {
   onSave?: (title: string, teaser: string, content: string, isDraft: boolean) => Promise<void>;
   isSaving?: boolean;
 }
+
+const FONT_SIZES = [
+  { label: 'Small', mark: 'textSmall' },
+  { label: 'Normal', mark: '' },
+  { label: 'Large', mark: 'textLarge' },
+  { label: 'Extra Large', mark: 'textXLarge' }
+]
+
+const TEXT_COLORS = [
+  { label: 'Black', mark: '' },
+  { label: 'Blue', mark: 'textBlue' },
+  { label: 'Green', mark: 'textGreen' },
+  { label: 'Red', mark: 'textRed' },
+  { label: 'Purple', mark: 'textPurple' }
+]
 
 export default function PostEditor({ 
   initialContent, 
@@ -36,10 +54,16 @@ export default function PostEditor({
   const [isSaving, setIsSaving] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
+  const [currentFontSizeIndex, setCurrentFontSizeIndex] = useState(1) // Normal
+  const [currentColorIndex, setCurrentColorIndex] = useState(0) // Black
   
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
       Placeholder.configure({
         placeholder: 'Start writing your post...',
       }),
@@ -63,6 +87,9 @@ export default function PostEditor({
           class: 'my-8 border-t border-gray-300',
         },
       }),
+      Superscript,
+      Subscript,
+      TextMarks,
     ],
     content: initialContent,
     editorProps: {
@@ -203,6 +230,38 @@ export default function PostEditor({
     }
   }
 
+  const handleFontSize = () => {
+    const newIndex = (currentFontSizeIndex + 1) % FONT_SIZES.length
+    setCurrentFontSizeIndex(newIndex)
+    
+    // Remove the mark if we're setting to normal
+    if (!FONT_SIZES[newIndex].mark) {
+      editor?.chain().focus().unsetMark('textMarks').run()
+      return
+    }
+    
+    // Set the new mark
+    editor?.chain().focus()
+      .setMark('textMarks', { 'data-type': FONT_SIZES[newIndex].mark })
+      .run()
+  }
+
+  const handleTextColor = () => {
+    const newIndex = (currentColorIndex + 1) % TEXT_COLORS.length
+    setCurrentColorIndex(newIndex)
+    
+    // Remove the mark if we're setting to black
+    if (!TEXT_COLORS[newIndex].mark) {
+      editor?.chain().focus().unsetMark('textMarks').run()
+      return
+    }
+    
+    // Set the new mark
+    editor?.chain().focus()
+      .setMark('textMarks', { 'data-type': TEXT_COLORS[newIndex].mark })
+      .run()
+  }
+
   return (
     <form className="space-y-6">
       <div>
@@ -272,6 +331,38 @@ export default function PostEditor({
               className={`p-2 rounded hover:bg-gray-100 ${editor?.isActive('orderedList') ? 'bg-gray-100' : ''}`}
             >
               Numbered List
+            </button>
+            <button
+              type="button"
+              onClick={handleFontSize}
+              className={`p-2 rounded hover:bg-gray-100 ${currentFontSizeIndex !== 1 ? 'bg-gray-100' : ''}`}
+              title={`Current: ${FONT_SIZES[currentFontSizeIndex].label}`}
+            >
+              <Type className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleTextColor}
+              className={`p-2 rounded hover:bg-gray-100`}
+              title={`Current: ${TEXT_COLORS[currentColorIndex].label}`}
+            >
+              <Type className={`h-4 w-4 ${TEXT_COLORS[currentColorIndex].mark || ''}`} />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor?.chain().focus().toggleSuperscript().run()}
+              className={`p-2 rounded hover:bg-gray-100 ${editor?.isActive('superscript') ? 'bg-gray-100' : ''}`}
+              title="Toggle superscript"
+            >
+              <SuperscriptIcon className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => editor?.chain().focus().toggleSubscript().run()}
+              className={`p-2 rounded hover:bg-gray-100 ${editor?.isActive('subscript') ? 'bg-gray-100' : ''}`}
+              title="Toggle subscript"
+            >
+              <SubscriptIcon className="h-4 w-4" />
             </button>
             <button
               type="button"
