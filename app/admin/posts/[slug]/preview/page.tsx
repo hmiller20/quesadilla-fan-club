@@ -1,4 +1,6 @@
-import React from "react"
+'use client'
+
+import React, { useEffect } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { prisma } from "@/lib/db"
@@ -18,6 +20,18 @@ async function getParams(params: PageProps['params']) {
 }
 
 export default async function PreviewPostPage({ params }: PageProps) {
+  useEffect(() => {
+    // Add target="_blank" to all external links
+    const content = document.querySelector('.prose')
+    if (content) {
+      const links = content.querySelectorAll('a[href^="http"]')
+      links.forEach(link => {
+        link.setAttribute('target', '_blank')
+        link.setAttribute('rel', 'noopener noreferrer')
+      })
+    }
+  }, [])
+
   try {
     const runtimeParams = await getParams(params)
     

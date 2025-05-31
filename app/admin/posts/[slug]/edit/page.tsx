@@ -68,6 +68,7 @@ export default async function EditPost({ params, searchParams }: PageProps) {
           initialTitle={post.title}
           initialTeaser={post.teaser || ''}
           postId={post.id}
+          slug={post.slug}
           isPublished={post.isPublished}
         />
       </div>

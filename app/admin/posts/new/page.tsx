@@ -98,6 +98,7 @@ export default function NewPost() {
         initialTitle=""
         initialTeaser=""
         postId=""
+        slug=""
         isPublished={false}
         onSave={handleSave}
         isSaving={isSubmitting}

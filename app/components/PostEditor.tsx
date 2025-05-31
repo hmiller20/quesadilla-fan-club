@@ -15,6 +15,7 @@ type PostEditorProps = {
   initialTitle: string
   initialTeaser?: string
   postId: string
+  slug: string
   isPublished: boolean
   onSave?: (title: string, teaser: string, content: string, isDraft: boolean) => Promise<void>;
   isSaving?: boolean;
@@ -25,6 +26,7 @@ export default function PostEditor({
   initialTitle,
   initialTeaser = '',
   postId,
+  slug,
   isPublished,
   onSave,
   isSaving: isSavingProp
@@ -42,7 +44,14 @@ export default function PostEditor({
         placeholder: 'Start writing your post...',
       }),
       Link.configure({
-        openOnClick: false,
+        openOnClick: true,
+        HTMLAttributes: {
+          class: 'text-green-700 underline hover:text-green-900 cursor-pointer relative group',
+          target: '_blank',
+          rel: 'noopener noreferrer',
+        },
+        protocols: ['http', 'https', 'mailto', 'tel'],
+        validate: href => /^(https?:\/\/|mailto:|tel:)/.test(href),
       }),
       Image.configure({
         HTMLAttributes: {
@@ -148,6 +157,34 @@ export default function PostEditor({
     }
   }
 
+  const handleLink = () => {
+    const previousUrl = editor?.getAttributes('link').href
+    const url = window.prompt('Enter the URL:', previousUrl)
+    
+    // If no url is entered or user cancels, and there was no previous url, do nothing
+    if (url === null) return
+    
+    // If url is empty, remove the link
+    if (url === '') {
+      editor?.chain().focus().unsetLink().run()
+      return
+    }
+    
+    // Add https:// if no protocol is specified
+    let fullUrl = url
+    if (!url.match(/^(https?:\/\/|mailto:|tel:)/)) {
+      fullUrl = `https://${url}`
+    }
+    
+    // Ensure the URL is absolute
+    try {
+      new URL(fullUrl) // This will throw if the URL is invalid
+      editor?.chain().focus().setLink({ href: fullUrl }).run()
+    } catch (e) {
+      alert('Please enter a valid URL')
+    }
+  }
+
   const handlePreview = () => {
     if (!postId) {
       // For new posts, we need to save first
@@ -161,8 +198,8 @@ export default function PostEditor({
         // The user can then click preview again
       })
     } else {
-      // For existing posts, open preview in new tab
-      window.open(`/admin/posts/${postId}/preview`, '_blank')
+      // For existing posts, open preview in new tab using the slug
+      window.open(`/admin/posts/${slug}/preview`, '_blank')
     }
   }
 
@@ -238,13 +275,9 @@ export default function PostEditor({
             </button>
             <button
               type="button"
-              onClick={() => {
-                const url = window.prompt('Enter the URL')
-                if (url) {
-                  editor?.chain().focus().setLink({ href: url }).run()
-                }
-              }}
+              onClick={handleLink}
               className={`p-2 rounded hover:bg-gray-100 ${editor?.isActive('link') ? 'bg-gray-100' : ''}`}
+              title="Add or edit link"
             >
               Link
             </button>

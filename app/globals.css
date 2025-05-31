@@ -1,0 +1,30 @@
+/* Link styles for editor (admin view) */
+.ProseMirror a {
+  @apply text-green-700 underline hover:text-green-900 cursor-pointer relative;
+}
+
+.ProseMirror a:hover::after {
+  content: attr(href);
+  @apply absolute -top-8 left-0 bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap;
+}
+
+/* Link styles for public view */
+.prose a {
+  @apply text-green-700 underline hover:text-green-900 transition-colors;
+}
+
+.prose a[href^="http"]::after {
+  content: "↗";
+  @apply ml-0.5 inline-block;
+}
+
+/* Add target _blank to external links in public view */
+.prose a[href^="http"] {
+  @apply cursor-pointer;
+}
+
+/* Override any default prose link styles */
+.prose :where(a):not(:where([class~="not-prose"] *)) {
+  @apply text-green-700 underline hover:text-green-900 transition-colors;
+  text-decoration-color: inherit;
+} 
