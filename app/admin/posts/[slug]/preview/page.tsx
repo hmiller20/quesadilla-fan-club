@@ -6,6 +6,7 @@ import { ArrowLeft } from "lucide-react"
 import { prisma } from "@/lib/db"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { format } from "date-fns"
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +18,14 @@ interface PageProps {
 async function getParams(params: PageProps['params']) {
   if (!params) throw new Error('No params provided')
   return await params
+}
+
+function formatDate(date: string | Date | null): string {
+  if (!date) return 'Draft'
+  const d = new Date(date)
+  // Adjust for local timezone
+  const localDate = new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
+  return format(localDate, 'MMMM d, yyyy')
 }
 
 export default async function PreviewPostPage({ params }: PageProps) {
@@ -73,7 +82,7 @@ export default async function PreviewPostPage({ params }: PageProps) {
         <article>
           <header className="mb-8">
             <time className="text-sm text-gray-500">
-              {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : 'Draft'}
+              {formatDate(post.publishedAt)}
             </time>
             <h1 className="text-3xl font-bold mt-2">{post.title}</h1>
             {post.teaser && (

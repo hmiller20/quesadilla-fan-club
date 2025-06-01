@@ -102,7 +102,7 @@ export default function PostEditor({
     },
   })
 
-  const savePost = async (shouldPublish: boolean) => {
+  const savePost = async (shouldPublish: boolean, shouldShare: boolean = false) => {
     if (!editor) return
     if (onSave) {
       // Use parent-provided save handler (for new post)
@@ -121,6 +121,7 @@ export default function PostEditor({
           teaser,
           content: editor.getHTML(),
           isPublished: shouldPublish,
+          shouldShare,
         }),
       })
       if (!response.ok) {
@@ -141,7 +142,22 @@ export default function PostEditor({
 
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault()
-    await savePost(true)
+    
+    // Show confirmation dialog
+    const shouldShare = window.confirm(
+      'Would you like to share this post with subscribers?\n\n' +
+      'Click "OK" to share with subscribers\n' +
+      'Click "Cancel" to publish silently'
+    )
+    
+    await savePost(true, shouldShare)
+    
+    // Show feedback about what happened
+    if (shouldShare) {
+      alert('Post published and shared with subscribers!')
+    } else {
+      alert('Post published silently (not shared with subscribers)')
+    }
   }
 
   const handleImageUpload = async () => {

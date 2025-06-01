@@ -2,6 +2,15 @@
 
 import Link from "next/link"
 import { prisma } from "@/lib/db"
+import { format } from "date-fns"
+
+function formatDate(date: string | Date | null): string {
+  if (!date) return 'Draft'
+  const d = new Date(date)
+  // Adjust for local timezone
+  const localDate = new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
+  return format(localDate, 'MMMM d, yyyy')
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +45,7 @@ export default async function PostsPage() {
                 <p className="text-gray-600 mt-1 mb-2">{post.teaser}</p>
               )}
               <span className="text-sm text-gray-500">
-                {post.publishedAt && new Date(post.publishedAt).toLocaleDateString()}
+                {formatDate(post.publishedAt)}
               </span>
             </li>
           ))
