@@ -7,6 +7,7 @@ import { Pencil, Trash2, Eye, Calendar, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/lib/context/auth-context'
 import { useRouter } from 'next/navigation'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface DraftPost {
   id: string
@@ -24,6 +25,8 @@ export default function DraftsPage() {
   const [drafts, setDrafts] = useState<DraftPost[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingPublishId, setPendingPublishId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -65,10 +68,11 @@ export default function DraftsPage() {
   }
 
   const handlePublish = async (id: string) => {
-    // Ask Share or Silent
-    const result = window.confirm("Would you like to share this post with all subscribers?\n\nPress Yes for 'Share', No for 'Silent'.")
-    const share = result // Yes = Share, No = Silent
+    setPendingPublishId(id)
+    setShowConfirm(true)
+  }
 
+  const actuallyPublish = async (id: string, share: boolean) => {
     try {
       const response = await fetch(`/api/posts?id=${id}&action=publish`, {
         method: 'PATCH',
@@ -82,6 +86,20 @@ export default function DraftsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to publish post')
     }
+  }
+
+  const handleConfirm = async () => {
+    setShowConfirm(false)
+    if (!pendingPublishId) return
+    // After confirming, show Share or Silent dialog
+    const result = window.confirm("Would you like to share this post with all subscribers?\n\nPress Yes for 'Share', No for 'Silent'.")
+    await actuallyPublish(pendingPublishId, result)
+    setPendingPublishId(null)
+  }
+
+  const handleCancel = () => {
+    setShowConfirm(false)
+    setPendingPublishId(null)
   }
 
   if (loading || isLoading) {
@@ -184,6 +202,12 @@ export default function DraftsPage() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={showConfirm}
+        message="Are you sure you want to publish?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </div>
   )
 } 

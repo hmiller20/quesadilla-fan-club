@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Trash2, Eye, Calendar, ExternalLink } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 interface Post {
   id: string
@@ -25,6 +26,8 @@ export default function ManagePosts() {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingShareId, setPendingShareId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -63,6 +66,40 @@ export default function ManagePosts() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to move post to trash')
     }
+  }
+
+  const handleShare = (id: string) => {
+    setPendingShareId(id)
+    setShowConfirm(true)
+  }
+
+  const actuallyShare = async (id: string) => {
+    try {
+      const response = await fetch(`/api/posts?id=${id}&action=share`, {
+        method: 'PATCH',
+      })
+      if (!response.ok) throw new Error('Failed to share post')
+      alert('Post shared with all subscribers!')
+    } catch (err) {
+      alert('Failed to share post')
+    }
+  }
+
+  const handleConfirm = async () => {
+    setShowConfirm(false)
+    if (!pendingShareId) return
+    // After confirming, show the original share dialog
+    if (!window.confirm("Send this post to all subscribers now?")) {
+      setPendingShareId(null)
+      return
+    }
+    await actuallyShare(pendingShareId)
+    setPendingShareId(null)
+  }
+
+  const handleCancel = () => {
+    setShowConfirm(false)
+    setPendingShareId(null)
   }
 
   if (loading || isLoading) {
@@ -145,18 +182,7 @@ export default function ManagePosts() {
                     variant="outline"
                     size="sm"
                     className="flex-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                    onClick={async () => {
-                      if (!window.confirm("Send this post to all subscribers now?")) return
-                      try {
-                        const response = await fetch(`/api/posts?id=${post.id}&action=share`, {
-                          method: 'PATCH',
-                        })
-                        if (!response.ok) throw new Error('Failed to share post')
-                        alert('Post shared with all subscribers!')
-                      } catch (err) {
-                        alert('Failed to share post')
-                      }
-                    }}
+                    onClick={() => handleShare(post.id)}
                   >
                     Share
                   </Button>
@@ -175,6 +201,12 @@ export default function ManagePosts() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={showConfirm}
+        message="Are you sure you want to share?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </div>
   )
 } 

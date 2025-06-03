@@ -6,12 +6,20 @@ import Editor from "@/components/editor"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/context/auth-context"
 import PostEditor from '@/app/components/PostEditor'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 export default function NewPost() {
   const router = useRouter()
   const { user, loading, isAuthenticated } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingSave, setPendingSave] = useState<{
+    title: string
+    teaser: string
+    content: string
+    isDraft: boolean
+  } | null>(null)
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -28,16 +36,23 @@ export default function NewPost() {
       setError('Please enter a title')
       return
     }
+    if (!isDraft) {
+      // Show confirmation dialog before proceeding
+      setPendingSave({ title, teaser, content, isDraft })
+      setShowConfirm(true)
+      return
+    }
+    // If saving as draft, proceed as before
+    await actuallySave(title, teaser, content, isDraft, false)
+  }
+
+  const actuallySave = async (title: string, teaser: string, content: string, isDraft: boolean, share: boolean) => {
+    if (!user) {
+      setError('You must be signed in to create a post')
+      return
+    }
     setIsSubmitting(true)
     setError(null)
-
-    // If publishing, ask Share or Silent
-    let share = false
-    if (!isDraft) {
-      const result = window.confirm("Would you like to share this post with all subscribers?\n\nPress Yes for 'Share', No for 'Silent'.")
-      share = result // Yes = Share, No = Silent
-    }
-
     try {
       const response = await fetch('/api/posts', {
         method: 'POST',
@@ -68,6 +83,20 @@ export default function NewPost() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleConfirm = async () => {
+    setShowConfirm(false)
+    if (!pendingSave) return
+    // After confirming, show Share or Silent dialog
+    const result = window.confirm("Would you like to share this post with all subscribers?\n\nPress Yes for 'Share', No for 'Silent'.")
+    await actuallySave(pendingSave.title, pendingSave.teaser, pendingSave.content, pendingSave.isDraft, result)
+    setPendingSave(null)
+  }
+
+  const handleCancel = () => {
+    setShowConfirm(false)
+    setPendingSave(null)
   }
 
   if (loading) {
@@ -102,6 +131,12 @@ export default function NewPost() {
         isPublished={false}
         onSave={handleSave}
         isSaving={isSubmitting}
+      />
+      <ConfirmDialog
+        open={showConfirm}
+        message="Are you sure you want to publish?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
       />
     </div>
   )
