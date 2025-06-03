@@ -12,6 +12,7 @@ import Superscript from '@tiptap/extension-superscript'
 import Subscript from '@tiptap/extension-subscript'
 import { ImageIcon, Minus, Hash, Eye, Type, Superscript as SuperscriptIcon, Subscript as SubscriptIcon } from 'lucide-react'
 import { TextMarks } from './extensions/TextMarks'
+import ConfirmDialog from '@/components/ConfirmDialog'
 
 type PostEditorProps = {
   initialContent: string
@@ -56,6 +57,8 @@ export default function PostEditor({
   const router = useRouter()
   const [currentFontSizeIndex, setCurrentFontSizeIndex] = useState(1) // Normal
   const [currentColorIndex, setCurrentColorIndex] = useState(0) // Black
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [pendingPublishEvent, setPendingPublishEvent] = useState<React.FormEvent | null>(null)
   
   const editor = useEditor({
     extensions: [
@@ -142,22 +145,31 @@ export default function PostEditor({
 
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Show confirmation dialog
+    if (onSave) {
+      // Use parent-provided save handler (for new post)
+      await savePost(true)
+      return
+    }
+    // Show confirmation dialog first
+    setPendingPublishEvent(e)
+    setShowConfirm(true)
+  }
+
+  const handleConfirm = async () => {
+    setShowConfirm(false)
+    // After confirming, show Share or Silent dialog
     const shouldShare = window.confirm(
       'Would you like to share this post with subscribers?\n\n' +
       'Click "OK" to share with subscribers\n' +
       'Click "Cancel" to publish silently'
     )
-    
     await savePost(true, shouldShare)
-    
-    // Show feedback about what happened
-    if (shouldShare) {
-      alert('Post published and shared with subscribers!')
-    } else {
-      alert('Post published silently (not shared with subscribers)')
-    }
+    setPendingPublishEvent(null)
+  }
+
+  const handleCancel = () => {
+    setShowConfirm(false)
+    setPendingPublishEvent(null)
   }
 
   const handleImageUpload = async () => {
@@ -447,6 +459,12 @@ export default function PostEditor({
           {(isSavingProp !== undefined ? isSavingProp : isSaving) ? 'Publishing...' : 'Publish'}
         </button>
       </div>
+      <ConfirmDialog
+        open={showConfirm}
+        message="Are you sure you want to publish?"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </form>
   )
 } 
