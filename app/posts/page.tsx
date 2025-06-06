@@ -6,7 +6,7 @@ import { format } from "date-fns"
 
 function formatDate(date: string | Date | null): string {
   if (!date) return 'Draft'
-  return new Date(date).toLocaleDateString()
+  return new Date(date).toLocaleDateString('en-US', { timeZone: 'America/New_York' })
 }
 
 export const dynamic = 'force-dynamic'

@@ -69,7 +69,7 @@ export default async function PostPage({ params }: PageProps) {
         <article>
           <header className="mb-8">
             <time className="text-sm text-gray-500">
-              {new Date(post.publishedAt).toLocaleDateString()}
+              {new Date(post.publishedAt).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}
             </time>
             <h1 className="text-3xl font-bold mt-2">{post.title}</h1>
             {post.teaser && (

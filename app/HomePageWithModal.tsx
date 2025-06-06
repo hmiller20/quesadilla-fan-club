@@ -30,7 +30,7 @@ export default function HomePageWithModal({ posts }: { posts: any[] }) {
                     <p className="text-gray-600 mt-1 mb-2">{post.teaser}</p>
                   )}
                   <span className="text-sm text-gray-500">
-                    {post.publishedAt && new Date(post.publishedAt).toLocaleDateString()}
+                    {post.publishedAt && new Date(post.publishedAt).toLocaleDateString('en-US', { timeZone: 'America/New_York' })}
                   </span>
                 </li>
               ))
