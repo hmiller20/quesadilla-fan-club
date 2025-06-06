@@ -6,10 +6,7 @@ import { format } from "date-fns"
 
 function formatDate(date: string | Date | null): string {
   if (!date) return 'Draft'
-  const d = new Date(date)
-  // Adjust for local timezone
-  const localDate = new Date(d.getTime() - (d.getTimezoneOffset() * 60000))
-  return format(localDate, 'MMMM d, yyyy')
+  return new Date(date).toLocaleDateString()
 }
 
 export const dynamic = 'force-dynamic'
